@@ -26,3 +26,18 @@ Upstream: https://github.com/mixutin/dauntless-revived
 Official documentation: https://mixutin.github.io/dauntless-revived/reference/api.html
 
 The documented account key is a full game-login credential and has no self-service revocation route. **Do not ask users to enter it in GitHub Pages.** The existing endpoints are game endpoints, not a scoped third-party companion authorization flow. For live integration, seek server-owner approval for a dedicated read-only endpoint and short-lived, limited-scope authorization. A static demo must not claim a live connection. Manual entry and locally imported non-secret exports remain available.
+
+## Verified upstream integration research (October 2026)
+
+Official documentation: https://mixutin.github.io/dauntless-revived/reference/api.html
+
+The private server supports the following player-token authenticated read endpoints, subject to actual server configuration and administrator permission:
+- `GET /progression/:userId` (own tracks/mastery)
+- `GET /progression/objectives/:userId` (own objectives)
+- `GET /huntpass/:userId` (selected Hunt Pass)
+- `GET /entitlementsv2` (account entitlements)
+- Further inventory, character and loadout GET routes are described in the API reference.
+
+**Do not implement browser-based exchange of account keys**: `UUK_` keys permit game login and access to other account functions, and cannot currently be revoked through an API. A player JWT also grants access to game routes and is not inherently read-only. Browser CORS support and administrator consent must be verified. If an official limited-scope companion token or admin-approved export is unavailable, prefer non-secret data export and local import. Never expose account credentials, server admin keys or full player tokens through GitHub Pages or the repo.
+
+Suggested next step: coordinate with server owner on a new read-only `/companion/v1/me` endpoint with explicit permission, scoped short-lived authorization, allowed origins, rate limits and minimal data, before implementing live sync.
