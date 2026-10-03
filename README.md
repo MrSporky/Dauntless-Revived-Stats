@@ -21,3 +21,8 @@ Once published: https://mrsporky.github.io/Dauntless-Revived-Stats/
 The upstream Dauntless Revived repository describes self-hosted servers with personal account keys. Never send keys to this static frontend, embed keys in JavaScript, or commit them. Live integration needs **explicit permission from the server administrator** and a dedicated HTTPS backend. Preferred design: server issues a short-lived, read-only companion token scoped to the relevant player after authentication; backend validates it with that server and returns only approved stats to the browser. Until such an API exists, use manual companion records or a vetted, non-secret export.
 
 Upstream: https://github.com/mixutin/dauntless-revived
+
+## Official server compatibility
+Official documentation: https://mixutin.github.io/dauntless-revived/reference/api.html
+
+The documented account key is a full game-login credential and has no self-service revocation route. **Do not ask users to enter it in GitHub Pages.** The existing endpoints are game endpoints, not a scoped third-party companion authorization flow. For live integration, seek server-owner approval for a dedicated read-only endpoint and short-lived, limited-scope authorization. A static demo must not claim a live connection. Manual entry and locally imported non-secret exports remain available.
