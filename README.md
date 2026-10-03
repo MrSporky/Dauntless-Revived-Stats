@@ -1,11 +1,23 @@
-# Dauntless Revived Command Center
+# Dauntless Revived Command Center — v0.3
 
-A community-made, browser-based companion dashboard. Open `index.html` to preview. Records are stored locally in your browser. Current damage calculations are illustrative, not validated against game formulas. Live account integration is not implemented.
+Independent fan-made web companion for Dauntless Revived. No live game connection is implemented.
 
-## Publish with GitHub Pages
+## Features in this preview
+- Mobile-responsive dark fantasy dashboard
+- Local Slayer profile
+- Experimental arithmetic damage calculator (not verified against game mechanics)
+- Create builds and export/import companion JSON backups
+- Manual hunt recording, duration graph, and personal bests
+- Local achievement notes
+- Account Integration information screen: no account key collection
 
-Make the repository public if needed for your GitHub plan. Go to Settings → Pages → Build and deployment → Deploy from a branch → main / (root) → Save.
+All profile, build, hunt and note data is stored in your browser localStorage. Export regularly; clearing browser storage or switching devices will not transfer it.
 
-Expected URL after deployment: https://mrsporky.github.io/Dauntless-Revived-Stats/
+## GitHub Pages
+Settings → Pages → Deploy from branch → main → / (root) → Save.
+Once published: https://mrsporky.github.io/Dauntless-Revived-Stats/
 
-Never commit or paste personal account keys into this frontend; any future account connection must use an authorized secure backend.
+## Account link architecture (not implemented)
+The upstream Dauntless Revived repository describes self-hosted servers with personal account keys. Never send keys to this static frontend, embed keys in JavaScript, or commit them. Live integration needs **explicit permission from the server administrator** and a dedicated HTTPS backend. Preferred design: server issues a short-lived, read-only companion token scoped to the relevant player after authentication; backend validates it with that server and returns only approved stats to the browser. Until such an API exists, use manual companion records or a vetted, non-secret export.
+
+Upstream: https://github.com/mixutin/dauntless-revived
