@@ -41,3 +41,14 @@ The private server supports the following player-token authenticated read endpoi
 **Do not implement browser-based exchange of account keys**: `UUK_` keys permit game login and access to other account functions, and cannot currently be revoked through an API. A player JWT also grants access to game routes and is not inherently read-only. Browser CORS support and administrator consent must be verified. If an official limited-scope companion token or admin-approved export is unavailable, prefer non-secret data export and local import. Never expose account credentials, server admin keys or full player tokens through GitHub Pages or the repo.
 
 Suggested next step: coordinate with server owner on a new read-only `/companion/v1/me` endpoint with explicit permission, scoped short-lived authorization, allowed origins, rate limits and minimal data, before implementing live sync.
+
+
+## v0.4: Local-only Slayer Statistics
+The **Slayer Stats** tab can read our own `dauntless-command-center-stats-v1` JSON snapshot. It displays Slayer level, Hunt Pass level, mastery, currencies, inventory (with text search) and loadouts, entirely in the browser. Click **Download example** for the expected JSON structure. Imported data is not live or independently verified. Import is restricted to the expected fields and rejects common account credential patterns. Do not place any game account key or token in imports.
+
+This format is **not an official Dauntless Revived export**. Future mapping from an actual server-provided *non-secret, approved export* will require that server's export schema and permission.
+
+### Real sync requirements
+The upstream Dauntless Revived docs (https://mixutin.github.io/dauntless-revived/reference/api.html) describe authenticated GET routes such as `/character`, `/inventory/:userId/:characterId`, `/progression/:userId` and `/loadout/:characterId`. The existing `UUK_` account key can log in as its owner and currently has no public revoke/reissue API. Player JWTs likewise can invoke all that player's game routes; they are not restricted read-only credentials. Do not put either credential in GitHub Pages, browser localStorage, uploaded JSON, issues, commits or third-party backend logs.
+
+Live syncing requires consent from the **actual server administrator**, confirmation of which server hosts the player, and ideally a server-side narrowly scoped, short-lived companion token or server-provided stats export. A static GitHub Pages site cannot keep backend secrets; an approved live-sync service would be a separate HTTPS backend with CORS, rate limits, secure server-only credentials, and a privacy policy. The upstream documentation describes its own host as invite-only, not a universal public server. Verify the specific host before attempting integration.
