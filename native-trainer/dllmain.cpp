@@ -17,6 +17,7 @@
 #include <atomic>
 #include <cmath>
 #include <filesystem>
+#include <fstream>
 #include <sstream>
 
 #include "framework.h"
