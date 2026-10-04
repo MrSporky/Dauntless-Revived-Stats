@@ -1,0 +1,60 @@
+name: Build SlayerForge Native Trainer
+
+on:
+  push:
+    branches:
+      - slayerforge-native-trainer-v45
+    paths:
+      - "native-trainer/**"
+      - ".github/workflows/build-slayerforge-native-trainer.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-2022
+    steps:
+      - name: Checkout build wrapper
+        uses: actions/checkout@v4
+
+      - name: Checkout Dauntless Revived source
+        uses: actions/checkout@v4
+        with:
+          repository: mixutin/dauntless-revived
+          ref: dauntless-revived
+          path: upstream
+
+      - name: Install SlayerForge combat source
+        shell: pwsh
+        run: |
+          Copy-Item -Force native-trainer/dllmain.cpp upstream/UndauntedInternalServer/dllmain.cpp
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Build x64 Release
+        shell: pwsh
+        run: |
+          msbuild upstream/UndauntedInternalServer/UndauntedInternalServer.sln /m /p:Configuration=Release /p:Platform=x64
+
+      - name: Collect DLL
+        shell: pwsh
+        run: |
+          $dll = Get-ChildItem -Path upstream/UndauntedInternalServer -Filter UndauntedInternalServer.dll -Recurse |
+            Where-Object { $_.FullName -match 'Release' } |
+            Select-Object -First 1
+          if (-not $dll) { throw "UndauntedInternalServer.dll was not produced." }
+          New-Item -ItemType Directory -Force artifact | Out-Null
+          Copy-Item $dll.FullName artifact/UndauntedInternalServer.dll
+          $hash = (Get-FileHash artifact/UndauntedInternalServer.dll -Algorithm SHA256).Hash.ToLowerInvariant()
+          Set-Content artifact/UndauntedInternalServer.sha256 $hash
+          Set-Content artifact/BUILD_INFO.txt "SlayerForge native trainer v4.5`nUpstream: mixutin/dauntless-revived@dauntless-revived`nSHA256: $hash"
+
+      - name: Upload native trainer
+        uses: actions/upload-artifact@v4
+        with:
+          name: SlayerForge-Native-Trainer-v4.5
+          path: artifact/
+          if-no-files-found: error
