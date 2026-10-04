@@ -60,6 +60,9 @@ namespace Trainer {
     static std::atomic<float> IncomingDamageMultiplier{1.0f};
     static std::atomic<bool> InfiniteStamina{false};
     static std::atomic<bool> OneHit{false};
+    static std::atomic<unsigned long long> OutgoingDamageEvents{0};
+    static std::atomic<unsigned long long> IncomingDamageEvents{0};
+    static std::atomic<unsigned long long> StaminaBypasses{0};
     static ULONGLONG LastRead = 0;
     static ULONGLONG LastStatusWrite = 0;
 
@@ -102,6 +105,9 @@ namespace Trainer {
                 Out << "incomingDamageMultiplier=" << IncomingDamageMultiplier.load() << "\n";
                 Out << "infiniteStamina=" << (InfiniteStamina.load() ? 1 : 0) << "\n";
                 Out << "oneHit=" << (OneHit.load() ? 1 : 0) << "\n";
+                Out << "outgoingDamageEvents=" << OutgoingDamageEvents.load() << "\n";
+                Out << "incomingDamageEvents=" << IncomingDamageEvents.load() << "\n";
+                Out << "staminaBypasses=" << StaminaBypasses.load() << "\n";
                 Out << "tick=" << Now << "\n";
             }
             MoveFileExW(Temp.c_str(), Final.c_str(), MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH);
@@ -176,6 +182,7 @@ namespace Trainer {
 
         const std::string Name = Function->GetFullName();
         if (Name.contains("ArchonCharacter.OnPreMitigateOutgoingDamageBP")) {
+            OutgoingDamageEvents.fetch_add(1);
             auto* P = static_cast<Params::ArchonCharacter_OnPreMitigateOutgoingDamageBP*>(Parms);
             FDamageEventData Data = P->bOverrideDamageData ? P->ReturnValue : P->DamageEventData;
             const float Scale = OneHit.load() ? 1000000.0f : DamageMultiplier.load();
@@ -184,6 +191,7 @@ namespace Trainer {
             P->bOverrideDamageData = true;
         }
         else if (Name.contains("ArchonCharacter.OnPreMitigateDamageBP")) {
+            IncomingDamageEvents.fetch_add(1);
             auto* P = static_cast<Params::ArchonCharacter_OnPreMitigateDamageBP*>(Parms);
             FDamageEventData Data = P->bOverrideDamageData ? P->ReturnValue : P->DamageEventData;
             ScaleDamage(Data, IncomingDamageMultiplier.load());
@@ -893,8 +901,10 @@ void InitClientHooks() {
 void* OrigSprint = nullptr;
 
 bool SprintHook(uintptr_t a1, uintptr_t a2, char a3, char a4) { // UArchonStaminaComponent_TryConsumeStamina_Native
-    if (Trainer::InfiniteStamina.load())
+    if (Trainer::InfiniteStamina.load()) {
+        Trainer::StaminaBypasses.fetch_add(1);
         return true;
+    }
     return reinterpret_cast<bool(*)(uintptr_t, uintptr_t, char, char)>(OrigSprint)(a1, a2, a3, a4);
 }
 
