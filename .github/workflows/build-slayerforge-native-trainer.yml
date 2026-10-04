@@ -23,7 +23,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: mixutin/dauntless-revived
-          ref: dauntless-revived
+          ref: e8e106a81f6ebae2eb4e9fa4da9ec6be9f6cdad5
           path: upstream
 
       - name: Install SlayerForge combat source
