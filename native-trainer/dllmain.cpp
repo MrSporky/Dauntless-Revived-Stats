@@ -64,8 +64,8 @@ namespace Trainer {
 
     static std::filesystem::path ProfileRoot() {
         wchar_t Buffer[32768] = {};
-        DWORD Length = GetEnvironmentVariableW(L"LOCALAPPDATA", Buffer, static_cast<DWORD>(std::size(Buffer)));
-        if (Length == 0 || Length >= std::size(Buffer))
+        DWORD Length = GetEnvironmentVariableW(L"LOCALAPPDATA", Buffer, static_cast<DWORD>(32768));
+        if (Length == 0 || Length >= 32768)
             return std::filesystem::temp_directory_path() / L"SlayerForge" / L"Undaunted";
         return std::filesystem::path(Buffer) / L"SlayerForge" / L"Undaunted";
     }
